@@ -7,6 +7,8 @@ extra:
     provider: mike
     alias: true
     default: latest
+extra_javascript:
+  - js/version-selector.js
 plugins:
   - mike:
       alias_type: symlink

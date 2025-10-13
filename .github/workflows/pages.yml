@@ -40,6 +40,7 @@ jobs:
                     mike delete --push $version
                 } else {
                     mike deploy --push $version
+                    gh pr comment $prNumber --body "Documentation preview available at https://psmodule.github.io/docs-test/$version/"
                 }
             } else {
                 mike deploy --push --update-aliases 0.3 latest
