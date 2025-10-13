@@ -1,0 +1,4 @@
+site_name: My Docs
+site_url: https://psmodule.io/docs-test/
+theme:
+  name: material
