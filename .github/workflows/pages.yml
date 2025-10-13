@@ -16,26 +16,13 @@ jobs:
           fetch-depth: 0         # mike needs history
           persist-credentials: true
 
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
       - uses: actions/setup-python@v6
         with:
           python-version: 3.x
 
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-
-      - uses: actions/cache@v4
+      - uses: PSModule/GitHub-Script@v1
         with:
-          key: mike-${{ env.cache_id }}
-          path: ~/.cache
-          restore-keys: |
-            mike-
-
-      - run: pip install mkdocs mkdocs-material mike
-
-      - run: |
-          mike deploy --push --update-aliases 0.15 latest
-          mike set-default --push latest
+          Script: |
+            pip install mkdocs mkdocs-material mike
+            mike deploy --push --update-aliases 0.16 latest
+            mike set-default --push latest
