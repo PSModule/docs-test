@@ -25,4 +25,4 @@ jobs:
           restore-keys: |
             mike-
       - run: pip install mkdocs mkdocs-material mike
-      - run: mike deploy --push --force --update-aliases 0.1 latest
+      - run: mike deploy --push --update-aliases 0.1 latest
