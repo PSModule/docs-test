@@ -28,6 +28,7 @@ jobs:
       - uses: PSModule/GitHub-Script@v1
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
         with:
           Script: |
             pip install mkdocs mkdocs-material mike
@@ -36,14 +37,38 @@ jobs:
                 $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
                 $action = $event.action
                 $prNumber = $env:PR_NUMBER
-                $version = "pr-$prNumber"
+                $prVersion = "pr-$prNumber"
+                $merged = $env:PR_MERGED -eq 'true'
+
                 if ($action -eq 'closed') {
-                    mike delete --push $version
+                    # Always clean up the PR preview version
+                    Write-Host "Cleaning up PR preview version: $prVersion"
+                    mike delete --push $prVersion
+
+                    if ($merged) {
+                        # PR was merged - deploy a versioned page
+                        Write-Host "PR was merged, deploying versioned documentation"
+                        # TODO: Determine version from git tags, version file, or milestone
+                        # For now, using a placeholder - customize this based on your versioning strategy
+                        $version = "0.3"  # Replace with actual version detection logic
+                        mike deploy --push --update-aliases $version latest
+                        mike set-default --push latest
+                        Write-Host "Deployed version $version and updated latest"
+                    } else {
+                        # PR was closed without merging (abandoned)
+                        Write-Host "PR was closed without merging (abandoned), cleanup complete"
+                    }
                 } else {
-                    mike deploy --push $version --prop-set hidden=true
-                    gh pr comment $prNumber --body "Documentation preview available at https://psmodule.github.io/docs-test/$version/"
+                    # PR opened, synchronized, or reopened - deploy preview
+                    Write-Host "Deploying PR preview version: $prVersion"
+                    mike deploy --push $prVersion --prop-set hidden=true
+                    gh pr comment $prNumber --body "Documentation preview available at https://psmodule.github.io/docs-test/$prVersion/"
                 }
             } else {
-                mike deploy --push --update-aliases 0.3 latest
+                # Direct push to main branch
+                Write-Host "Direct push to main branch, deploying versioned documentation"
+                # TODO: Determine version from git tags or version file
+                $version = "0.3"  # Replace with actual version detection logic
+                mike deploy --push --update-aliases $version latest
                 mike set-default --push latest
             }
