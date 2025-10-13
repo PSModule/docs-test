@@ -4,8 +4,6 @@ theme:
   name: material
   features:
     - content.code.copy
-    - content.code.annotate
-    - content.code.select
 extra:
   version:
     provider: mike
