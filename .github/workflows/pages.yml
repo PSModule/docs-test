@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, closed]
 
 permissions:
   contents: write
@@ -21,8 +25,23 @@ jobs:
           python-version: 3.x
 
       - uses: PSModule/GitHub-Script@v1
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         with:
           Script: |
             pip install mkdocs mkdocs-material mike
-            mike deploy --push --update-aliases 0.16 latest
-            mike set-default --push latest
+
+            if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
+                $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
+                $action = $event.action
+                $prNumber = $env:PR_NUMBER
+                $version = "pr-$prNumber"
+                if ($action -eq 'closed') {
+                    mike delete --push $version
+                } else {
+                    mike deploy --push $version
+                }
+            } else {
+                mike deploy --push --update-aliases 0.3 latest
+                mike set-default --push latest
+            }
