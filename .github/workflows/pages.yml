@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   deploy:
@@ -39,7 +40,8 @@ jobs:
                 if ($action -eq 'closed') {
                     mike delete --push $version
                 } else {
-                    mike deploy --push $version
+                    mike deploy --push $version --prop-set hidden=true
+                    gh pr comment $prNumber --body "Documentation preview available at https://psmodule.github.io/docs-test/$version/"
                 }
             } else {
                 mike deploy --push --update-aliases 0.3 latest
