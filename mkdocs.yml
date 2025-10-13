@@ -2,6 +2,8 @@ site_name: My Docs
 site_url: https://psmodule.io/docs-test/
 theme:
   name: material
+  features:
+    - content.code.copy
 extra:
   version:
     provider: mike
@@ -15,3 +17,9 @@ plugins:
       version_selector: true
       css_dir: css
       javascript_dir: js
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
